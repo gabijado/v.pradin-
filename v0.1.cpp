@@ -9,7 +9,7 @@ using std::cout;
 using std::cin;
 using::endl;
 using std::string;
-using std::vektor;
+using std::vector;
 using std::setw;
 using std::left;
 using std::right;
@@ -25,17 +25,17 @@ Studentas Stud_iv();
 
 int main(){
   Vector<Studentas> Grupe;
-  cout<<"Kiek studentų grupjė? ";
+  cout<<"Kiek studentu grupeje? ";
   int m;
   cin >> m;
-  for (auto z=0; z<m; z++)
+  for (int z=0; z<m; z++)
     Grupe.push_back(Stud_iv());
   cout<<"Studento info: "<< endl;
+  cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(15)<<"Galutinis<<endl;
+  cout<<string(50, '-')<<endl;
   for (auto Past:Grupe)
 {
-  cout << setw(10) << left << Past.var << "|" << setw(15) << right << Past.pav << "|";
-  for (auto& a : Past.paz) cout << setw(3)<<a<<"|";
-  cout << setw(5) << Past.egz << "|" << setw(10) << Past.gal << endl;
+  cout << left << setw(15) << Past.var << "|" << setw(20) << Past.pav << "|" << setw(15) << fixed << setprecision(2) << Past.gal << endl;
 }
 }
 
@@ -54,7 +54,7 @@ Studentas Stud_iv(){
     Pirmas.paz.push_back(laik_paz);
     sum+=laik_paz; //sum+=Pirmas.paz[a];
   }
-  cout<<"Iveskite egzamino pažymį: "; cin>>Pirmas.egz;
+  cout<<"Iveskite egzamino pazymi: "; cin>>Pirmas.egz;
   Pirmas.gal = double(sum)/double(n)*0.4 + Pirmas.egz*0.6;
   return Pirmas;
 }
