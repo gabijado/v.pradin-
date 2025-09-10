@@ -43,3 +43,4 @@ int main(){
   for (auto& a : Pirmas.paz) cout << setw(3)<<a<<"|";
   cout << setw(5) << Pirmas.egz << "|" << setw(10) << Pirmas.gal << endl;
 }
+...
