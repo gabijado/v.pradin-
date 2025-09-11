@@ -28,6 +28,7 @@ struct Studentas{
 double mediana(vector<int>paz){
     sort(paz.begin(),paz.end());
     int n = paz.size();
+    if (n == 0) return 0;
     if (n%2==0){
         return (paz[n/2-1]+paz[n/2])/2.0;
     } else{
@@ -40,30 +41,26 @@ int main(){
   cout <<"Ivesk studento duomenis"<< endl;
   cout << "Vardas: "; cin>>Pirmas.var;
   cout << "Pavarde: "; cin>>Pirmas.pav;
-  cin.ignore(numeric_limits<streamsize>::max(), '\n'); //isvalau buferi
   
-  cout <<"Iveskite namu darbu rezultatus (ENTER tuscia eilute - pabaiga ";
-  string eilute;
+  cout <<"Iveskite namu darbu rezultatus (baigti su 0): " << endl;
+  int pazymys;
   int sum = 0;
   while(true){
-      getline(cin, eilute);
-      if (eilute==" " ) break; //baigiam, jei nieko neirasyta
-      int laik_paz = stoi(eilute); //konvertuoja teksta i skaiciu
-      Pirmas.paz.push_back(laik_paz);
-      sum+= laik_paz;
+      cin >> pazymys;
+      if (pazymys == 0) break; //0 reiskia pabaiga
+      Pirmas.paz.push_back(pazymys);
+      sum+= pazymys;
   }
-  cout << "Kiek pazymiu turi " << Pirmas.var<< " " << Pirmas.pav<<": "; cin >> n;
- 
-  for (int a=0;a<n;a++)
-  {
-    cout<<a+1<<": "; cin >> laik_paz;
-    Pirmas.paz.push_back(laik_paz);
-    sum+=laik_paz; //sum+=Pirmas.paz[a];
-  }
-  cout<<"Iveskite egzamino pazymi: "; cin>>Pirmas.egz;
+  
+  cout<<"Iveskite egzamino pazymi: "; 
+  cin>>Pirmas.egz;
   
 //galutinis pagal vidurki
-  Pirmas.gal_vid = double(sum)/double(n)*0.4 + Pirmas.egz*0.6;
+  if(!Pirmas.paz.empty()){
+  Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
+  } else {
+      Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
+  }
 //galutinis pagal mediana
 double med = mediana(Pirmas.paz);
 Pirmas.gal_med = med*0.4+Pirmas.egz*0.6;
@@ -73,7 +70,8 @@ int pasirinkimas;
 cout<<"Pasirinkite galutinio balo skaiciavimo metoda: " << endl;
 cout << "1 - Vidurkis" << endl;
 cout << "2 - Mediana" << endl;
-cout << "3 - Abu" << endl; cin >> pasirinkimas;
+cout << "3 - Abu" << endl; 
+cin >> pasirinkimas;
 
   cout<<"Studento info: "<< endl;
  if (pasirinkimas == 1){
