@@ -3,6 +3,9 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <limits>
+#include <cstdlib>
+#include <ctime>
 
 
 using namespace std;
@@ -37,23 +40,46 @@ double mediana(vector<int>paz){
 }
 
 int main(){
+    srand(time(0)); //atsitiktiniu skaiciu generatorius
+    
   Studentas Pirmas;
   cout <<"Ivesk studento duomenis"<< endl;
   cout << "Vardas: "; cin>>Pirmas.var;
   cout << "Pavarde: "; cin>>Pirmas.pav;
   
-  cout <<"Iveskite namu darbu rezultatus (baigti su 0): " << endl;
-  int pazymys;
+  cout << "Pasirinkite veiksma: " << endl;
+  cout << "1 - Ivesti namu darbu ir egzamino pazymius ranka" << endl;
+  cout << "2 - Generuoti atsitiktinius pazymius" << endl;
+  int veiksmas;
+  cin >> veiksmas;
+  
   int sum = 0;
-  while(true){
+  
+  if (veiksmas == 1){
+      cout <<"Iveskite namu darbu rezultatus (baigti su 0): " << endl;
+      int pazymys;
+      while(true){
       cin >> pazymys;
       if (pazymys == 0) break; //0 reiskia pabaiga
       Pirmas.paz.push_back(pazymys);
-      sum+= pazymys;
+      sum += pazymys;
   }
   
   cout<<"Iveskite egzamino pazymi: "; 
   cin>>Pirmas.egz;
+  } else if (veiksmas == 2) {
+      int kiek_nd = rand() % 8+3; //tarp 3 ir 10 namu darbu
+      cout << "Sugeneruoti namu darbu pazymiai: ";
+      for (int i = 0; i < kiek_nd; i++) {
+          int pazymys = rand() % 10+1; //pazymis 1-10
+          Pirmas.paz.push_back(pazymys);
+          sum+=pazymys;
+          cout<< pazymys << " ";
+      }
+      cout << endl;
+      Pirmas.egz = rand() % 10+1; //egzaminas 1-10
+      cout << "Sugeneruotas egzamino pazymys: " << Pirmas.egz << endl;
+  }
   
 //galutinis pagal vidurki
   if(!Pirmas.paz.empty()){
