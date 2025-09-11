@@ -19,9 +19,9 @@ struct Studentas{
   string var;
   string pav;
   vector <int> paz;
-  int egz;
-  double gal_vid;
-  double gal_med;
+  int egz{};
+  double gal_vid{};
+  double gal_med{};
 };
 
 //funkcija medianai apskaiciuoti
@@ -36,11 +36,22 @@ double mediana(vector<int>paz){
 }
 
 int main(){
-  int n, laik_paz, sum=0;
   Studentas Pirmas;
   cout <<"Ivesk studento duomenis"<< endl;
   cout << "Vardas: "; cin>>Pirmas.var;
   cout << "Pavarde: "; cin>>Pirmas.pav;
+  cin.ignore(numeric_limits<streamsize>::max(), '\n'); //isvalau buferi
+  
+  cout <<"Iveskite namu darbu rezultatus (ENTER tuscia eilute - pabaiga ";
+  string eilute;
+  int sum = 0;
+  while(true){
+      getline(cin, eilute);
+      if (eilute==" " ) break; //baigiam, jei nieko neirasyta
+      int laik_paz = stoi(eilute); //konvertuoja teksta i skaiciu
+      Pirmas.paz.push_back(laik_paz);
+      sum+= laik_paz;
+  }
   cout << "Kiek pazymiu turi " << Pirmas.var<< " " << Pirmas.pav<<": "; cin >> n;
  
   for (int a=0;a<n;a++)
@@ -66,17 +77,16 @@ cout << "3 - Abu" << endl; cin >> pasirinkimas;
 
   cout<<"Studento info: "<< endl;
  if (pasirinkimas == 1){
-  cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(15)<<"Galutinis (Vid.)"<<endl; 
+  cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(18)<<"Galutinis (Vid.)"<<endl; 
   cout << string(50, '-') << endl;
-  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(15)<<fixed<<setprecision(2)<<Pirmas.gal_vid << endl;
+  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(18)<<fixed<<setprecision(2)<<Pirmas.gal_vid << endl;
  } else if (pasirinkimas == 2) {
      cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(18)<<"Galutinis (Med.)"<<endl; 
   cout << string(50, '-') << endl;
-  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(15)<<fixed<<setprecision(2)<<Pirmas.gal_med << endl;
+  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(18)<<fixed<<setprecision(2)<<Pirmas.gal_med << endl;
  } else if (pasirinkimas == 3){
-     cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(15)<<"Galutinis (Vid.)" << "|" << setw(15) << "Galutinis (Med.)" <<endl; 
+     cout<<left<<setw(15)<<"Vardas"<<"|"<<setw(20)<<"Pavarde"<<"|"<<setw(15)<<"Galutinis (Vid.)" << "|" << setw(18) << "Galutinis (Med.)" <<endl; 
   cout << string(70, '-') << endl;
-  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(15)<<fixed<<setprecision(2)<<Pirmas.gal_vid << "|" << setw(15) << fixed << setprecision(2) << Pirmas.gal_med << endl;
+  cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(18)<<fixed<<setprecision(2)<<Pirmas.gal_vid << "|" << setw(18) << fixed << setprecision(2) << Pirmas.gal_med << endl;
  }
 }
-
