@@ -6,6 +6,9 @@
 #include <limits>
 #include <cstdlib>
 #include <ctime>
+#include <fstream> //failų nuskaitymui
+
+
 
 
 using namespace std;
@@ -39,48 +42,73 @@ double mediana(vector<int>paz){
     }
 }
 
-int main(){
-    srand(time(0)); //atsitiktiniu skaiciu generatorius
+int main() {
+    srand(time(0));
     
-  Studentas Pirmas;
-  cout <<"Ivesk studento duomenis"<< endl;
-  cout << "Vardas: "; cin>>Pirmas.var;
-  cout << "Pavarde: "; cin>>Pirmas.pav;
-  
-  cout << "Pasirinkite veiksma: " << endl;
-  cout << "1 - Ivesti namu darbu ir egzamino pazymius ranka" << endl;
-  cout << "2 - Generuoti atsitiktinius pazymius" << endl;
-  int veiksmas;
-  cin >> veiksmas;
-  
-  int sum = 0;
-  
-  if (veiksmas == 1){
-      cout <<"Iveskite namu darbu rezultatus (baigti su 0): " << endl;
-      int pazymys;
-      while(true){
-      cin >> pazymys;
-      if (pazymys == 0) break; //0 reiskia pabaiga
-      Pirmas.paz.push_back(pazymys);
-      sum += pazymys;
-  }
-  
-  cout<<"Iveskite egzamino pazymi: "; 
-  cin>>Pirmas.egz;
-  } else if (veiksmas == 2) {
-      int kiek_nd = rand() % 8+3; //tarp 3 ir 10 namu darbu
-      cout << "Sugeneruoti namu darbu pazymiai: ";
-      for (int i = 0; i < kiek_nd; i++) {
-          int pazymys = rand() % 10+1; //pazymis 1-10
-          Pirmas.paz.push_back(pazymys);
-          sum+=pazymys;
-          cout<< pazymys << " ";
-      }
-      cout << endl;
-      Pirmas.egz = rand() % 10+1; //egzaminas 1-10
-      cout << "Sugeneruotas egzamino pazymys: " << Pirmas.egz << endl;
-  }
-  
+    Studentas Pirmas;
+    int sum = 0;
+    
+    cout << "Pasirinkite veiksma: " << endl;
+    cout << "1 - Ivesti studentus ranka" << endl;
+    cout << "2 - Generuoti atsitiktinius duomenis" << endl;
+    cout << "3 - Nuskaityti duomenis is failo" << endl;
+    int veiksmas;
+    cin >> veiksmas;
+    
+    if (veiksmas == 1) {
+        cout <<"Ivesk studento duomenis"<< endl;
+        cout << "Vardas: "; cin>>Pirmas.var;
+        cout << "Pavarde: "; cin>>Pirmas.pav;
+        
+        cout << "Iveskite namu darbu rezultatus (baigti su 0):" << endl;
+            int pazymys;
+            while (true) {
+                cin >> pazymys;
+                if (pazymys == 0) break;
+                Pirmas.paz.push_back(pazymys);
+                sum += pazymys;
+            }
+            
+            cout << "Iveskite egzamino pazymi: ";
+            cin >> Pirmas.egz;
+            
+    } else if (veiksmas == 2) {
+            cout << "Iveskite studento duomenis" << endl;
+            cout << "Vardas: ";
+            cin >> Pirmas.var;
+            cout << "Pavarde: ";
+            cin >> Pirmas.pav;
+            
+            int kiek_nd = rand() % 8+3; //tarp 3 ir 10 namu darbu
+            cout << "Sugeneruoti namu darbu pazymiai";
+            for (int i = 0; i < kiek_nd; i++) {
+                int pazymys = rand() % 10 + 1; //pazymis 1-10
+                Pirmas.paz.push_back(pazymys);
+                sum += pazymys;
+                cout << pazymys << " ";
+            }
+            cout << endl;
+            Pirmas.egz = rand() % 10+1; //egzaminas 1-10
+            cout << "Sugeneruotas egzamino pazymys: " << Pirmas.egz << endl;
+    
+    } else if (veiksmas == 3){
+        ifstream fin("kursiokai.txt");
+        if (!fin) {
+            cout << "Nepavyko atidaryti failo" << endl;
+            return 0;
+        }
+        fin >> Pirmas.var >> Pirmas.pav;
+        int pazymys;
+        for (int i = 0; i < 5; i++) {
+            fin >> pazymys;
+            Pirmas.paz.push_back(pazymys);
+            sum += pazymys;
+        }
+        fin >> Pirmas.egz;
+        fin.close();
+    }
+            
+        
 //galutinis pagal vidurki
   if(!Pirmas.paz.empty()){
   Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
