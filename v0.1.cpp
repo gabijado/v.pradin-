@@ -45,6 +45,7 @@ double mediana(vector<int>paz){
 int main() {
     srand(time(0));
     
+    vector<Studentas> studentai;
     Studentas Pirmas;
     int sum = 0;
     
@@ -72,13 +73,25 @@ int main() {
             cout << "Iveskite egzamino pazymi: ";
             cin >> Pirmas.egz;
             
-    } else if (veiksmas == 2) {
+//galutinis pagal vidurki
+  if(!Pirmas.paz.empty())
+  Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
+   else 
+      Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
+    
+    Pirmas.gal_med = mediana(Pirmas.paz)*0.4+Pirmas.egz*0.6;
+    
+    studentai.push_back(Pirmas);
+    }
+            
+     else if (veiksmas == 2) {
             cout << "Iveskite studento duomenis" << endl;
             cout << "Vardas: ";
             cin >> Pirmas.var;
             cout << "Pavarde: ";
             cin >> Pirmas.pav;
             
+            int sum = 0;
             int kiek_nd = rand() % 8+3; //tarp 3 ir 10 namu darbu
             cout << "Sugeneruoti namu darbu pazymiai";
             for (int i = 0; i < kiek_nd; i++) {
@@ -87,9 +100,19 @@ int main() {
                 sum += pazymys;
                 cout << pazymys << " ";
             }
-            cout << endl;
             Pirmas.egz = rand() % 10+1; //egzaminas 1-10
+            
             cout << "Sugeneruotas egzamino pazymys: " << Pirmas.egz << endl;
+            
+    if(!Pirmas.paz.empty()){
+    Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
+        else 
+    Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
+
+    
+        Pirmas.gal_med = mediana(Pirmas.paz)*0.4+Pirmas.egz*0.6;
+    
+        studentai.push_back(Pirmas);
     
     } else if (veiksmas == 3){
         ifstream fin("kursiokai.txt");
@@ -97,28 +120,33 @@ int main() {
             cout << "Nepavyko atidaryti failo" << endl;
             return 0;
         }
-        fin >> Pirmas.var >> Pirmas.pav;
-        int pazymys;
-        for (int i = 0; i < 5; i++) {
-            fin >> pazymys;
-            Pirmas.paz.push_back(pazymys);
-            sum += pazymys;
+        
+        while (true){
+            Studentas s;
+            int sum = 0;
+            fin >> s.var >> s.pav;
+            if (fin.eof()) break;
+            
+            int pazymys;
+            for (int i = 0; i < 5; i++){
+                fin >> pazymys;
+                s.paz.push_back(pazymys);
+                sum += pazymys;
+            }
+            fin >> s.egz;
+            
+            if (!s.paz.empty())
+                s.gal_vid = double(sum)/s.paz.size()*0.4 + s.egz*0.6;
+            else
+                s.gal_vid = s.egz;
+            
+            s.gal_med = mediana(s.paz)*0.4 + s.egz*0.6;
+            
+            studentai.push_back(s);
         }
-        fin >> Pirmas.egz;
         fin.close();
     }
-            
-        
-//galutinis pagal vidurki
-  if(!Pirmas.paz.empty()){
-  Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
-  } else {
-      Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
-  }
-//galutinis pagal mediana
-double med = mediana(Pirmas.paz);
-Pirmas.gal_med = med*0.4+Pirmas.egz*0.6;
-
+   
 //Pasirinkimas, ka rodyti
 int pasirinkimas;
 cout<<"Pasirinkite galutinio balo skaiciavimo metoda: " << endl;
@@ -141,4 +169,3 @@ cin >> pasirinkimas;
   cout << string(70, '-') << endl;
   cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(18)<<fixed<<setprecision(2)<<Pirmas.gal_vid << "|" << setw(18) << fixed << setprecision(2) << Pirmas.gal_med << endl;
  }
-}
