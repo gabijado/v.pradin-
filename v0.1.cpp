@@ -55,7 +55,7 @@ int main() {
     cout << "3 - Nuskaityti duomenis is failo" << endl;
     int veiksmas;
     cin >> veiksmas;
-    
+  
     if (veiksmas == 1) {
         cout <<"Ivesk studento duomenis"<< endl;
         cout << "Vardas: "; cin>>Pirmas.var;
@@ -75,16 +75,16 @@ int main() {
             
 //galutinis pagal vidurki
   if(!Pirmas.paz.empty())
-  Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
-   else 
-      Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
+    Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
+        else 
+    Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
     
     Pirmas.gal_med = mediana(Pirmas.paz)*0.4+Pirmas.egz*0.6;
     
     studentai.push_back(Pirmas);
     }
             
-     else if (veiksmas == 2) {
+        else if (veiksmas == 2) {
             cout << "Iveskite studento duomenis" << endl;
             cout << "Vardas: ";
             cin >> Pirmas.var;
@@ -100,15 +100,19 @@ int main() {
                 sum += pazymys;
                 cout << pazymys << " ";
             }
+            
+    
+            cout << endl;
+            
             Pirmas.egz = rand() % 10+1; //egzaminas 1-10
             
             cout << "Sugeneruotas egzamino pazymys: " << Pirmas.egz << endl;
             
     if(!Pirmas.paz.empty()){
-    Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
-        else 
-    Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
-
+        Pirmas.gal_vid = double(sum)/Pirmas.paz.size()*0.4 + Pirmas.egz*0.6;
+        } else {
+        Pirmas.gal_vid = Pirmas.egz; //jei nebuvo pazymiu
+        }
     
         Pirmas.gal_med = mediana(Pirmas.paz)*0.4+Pirmas.egz*0.6;
     
@@ -169,3 +173,4 @@ cin >> pasirinkimas;
   cout << string(70, '-') << endl;
   cout << left << setw(15) << Pirmas.var << "|" << setw(20) << Pirmas.pav << "|"<<setw(18)<<fixed<<setprecision(2)<<Pirmas.gal_vid << "|" << setw(18) << fixed << setprecision(2) << Pirmas.gal_med << endl;
  }
+}
