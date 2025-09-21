@@ -204,6 +204,36 @@ int main() {
         cout << "3 - Abu" << endl;
         cin >> pasirinkimas;
 
+        // Padaliname studentus į dvi grupes
+        vector<Studentas> vargsiukai;
+        vector<Studentas> kietiakiai;
+
+        for (auto& s : studentai) {
+            // naudokime pasirinkta metodą - pagal vidurkį
+            if (s.gal_vid < 5.0) {
+                vargsiukai.push_back(s);
+            }
+            else {
+                kietiakiai.push_back(s);
+            }
+        }
+
+        // Atspausdiname kiekvieną grupę
+        cout << "\n=== Vargsiukai (galutinis < 5.0) ===" << endl;
+        for (auto& s : vargsiukai) {
+            cout << left << setw(15) << s.var << " "
+                << setw(20) << s.pav << " "
+                << fixed << setprecision(2) << s.gal_vid << endl;
+        }
+
+        cout << "\n=== Kietiakiai (galutinis >= 5.0) ===" << endl;
+        for (auto& s : kietiakiai) {
+            cout << left << setw(15) << s.var << " "
+                << setw(20) << s.pav << " "
+                << fixed << setprecision(2) << s.gal_vid << endl;
+        }
+
+
         cout << "Studento informacija: " << endl;
         if (pasirinkimas == 1) {
             cout << left << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << endl;
