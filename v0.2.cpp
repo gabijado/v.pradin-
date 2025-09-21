@@ -191,7 +191,7 @@ int main() {
         }
     }
 
-    // jei pasirinkta 1-3, rodome lenteles
+    // jei pasirinkta 1-3, rodome lenteles + išvedame į failus
     if (veiksmas == 1 || veiksmas == 2 || veiksmas == 3) {
         sort(studentai.begin(), studentai.end(), [](const Studentas& a, const Studentas& b) {
             return a.pav < b.pav;
@@ -203,36 +203,6 @@ int main() {
         cout << "2 - Mediana" << endl;
         cout << "3 - Abu" << endl;
         cin >> pasirinkimas;
-
-        // Padaliname studentus į dvi grupes
-        vector<Studentas> vargsiukai;
-        vector<Studentas> kietiakiai;
-
-        for (auto& s : studentai) {
-            // naudokime pasirinkta metodą - pagal vidurkį
-            if (s.gal_vid < 5.0) {
-                vargsiukai.push_back(s);
-            }
-            else {
-                kietiakiai.push_back(s);
-            }
-        }
-
-        // Atspausdiname kiekvieną grupę
-        cout << "\n=== Vargsiukai (galutinis < 5.0) ===" << endl;
-        for (auto& s : vargsiukai) {
-            cout << left << setw(15) << s.var << " "
-                << setw(20) << s.pav << " "
-                << fixed << setprecision(2) << s.gal_vid << endl;
-        }
-
-        cout << "\n=== Kietiakiai (galutinis >= 5.0) ===" << endl;
-        for (auto& s : kietiakiai) {
-            cout << left << setw(15) << s.var << " "
-                << setw(20) << s.pav << " "
-                << fixed << setprecision(2) << s.gal_vid << endl;
-        }
-
 
         cout << "Studento informacija: " << endl;
         if (pasirinkimas == 1) {
@@ -256,6 +226,47 @@ int main() {
                 cout << left << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << fixed << setprecision(2) << s.gal_vid << "|" << setw(18) << fixed << setprecision(2) << s.gal_med << endl;
             }
         }
+
+        // Suskirstome studentus į dvi grupes pagal galutinį balą (vidurkį)
+        vector<Studentas> vargsiukai;
+        vector<Studentas> kietiakiai;
+
+        for (auto& s : studentai) {
+            if (s.gal_vid < 5.0) {
+                vargsiukai.push_back(s);
+            }
+            else {
+                kietiakiai.push_back(s);
+            }
+        }
+
+        // Įrašome vargsiukus į failą
+        ofstream fout_vargsiukai("vargsiukai.txt");
+        fout_vargsiukai << left << setw(15) << "Vardas"
+            << setw(20) << "Pavarde"
+            << setw(18) << "Galutinis (Vid.)" << endl;
+        fout_vargsiukai << string(55, '-') << endl;
+        for (auto& s : vargsiukai) {
+            fout_vargsiukai << left << setw(15) << s.var
+                << setw(20) << s.pav
+                << fixed << setprecision(2) << s.gal_vid << endl;
+        }
+        fout_vargsiukai.close();
+
+        // Įrašome kietiakius į failą
+        ofstream fout_kietiakiai("kietiakiai.txt");
+        fout_kietiakiai << left << setw(15) << "Vardas"
+            << setw(20) << "Pavarde"
+            << setw(18) << "Galutinis (Vid.)" << endl;
+        fout_kietiakiai << string(55, '-') << endl;
+        for (auto& s : kietiakiai) {
+            fout_kietiakiai << left << setw(15) << s.var
+                << setw(20) << s.pav
+                << fixed << setprecision(2) << s.gal_vid << endl;
+        }
+        fout_kietiakiai.close();
+
+        cout << "\nSugeneruoti failai: vargsiukai.txt ir kietiakiai.txt" << endl;
     }
 
     return 0;
