@@ -306,6 +306,7 @@ int main() {
 }
 
 //funkcijos.cpp
+
 #include "funkcijos.h"
 #include <iostream>
 #include <fstream>
@@ -313,9 +314,12 @@ int main() {
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
+// Apskaičiuoja medianą
 double mediana(vector<int> paz) {
     if (paz.empty()) return 0.0;
     sort(paz.begin(), paz.end());
@@ -326,6 +330,7 @@ double mediana(vector<int> paz) {
         return paz[n / 2];
 }
 
+// Rankinis studentų įvedimas
 void ivestiStudentus(vector<Studentas>& studentai) {
     int kiek;
     cout << "Kiek studentu norite ivesti? ";
@@ -364,6 +369,7 @@ void ivestiStudentus(vector<Studentas>& studentai) {
     }
 }
 
+// Atsitiktinių studentų generavimas
 void generuotiStudentus(vector<Studentas>& studentai) {
     srand(time(0));
     int kiek;
@@ -399,10 +405,11 @@ void generuotiStudentus(vector<Studentas>& studentai) {
     }
 }
 
+// Skaitymas iš failo
 void skaitytiIsFailo(vector<Studentas>& studentai, const string& failo_pavadinimas) {
     ifstream fin(failo_pavadinimas);
     if (!fin) {
-        cout << "Nepavyko atidaryti failo" << endl;
+        cout << "Nepavyko atidaryti failo: " << failo_pavadinimas << endl;
         return;
     }
 
@@ -432,17 +439,20 @@ void skaitytiIsFailo(vector<Studentas>& studentai, const string& failo_pavadinim
 
         studentai.push_back(s);
     }
-
     fin.close();
 }
 
+// Failų generavimas su laiko matavimu
 void sugeneruotiFailus() {
     srand(time(0));
     vector<int> dydziai = { 1000, 10000, 100000, 1000000, 10000000 };
+
     for (int d : dydziai) {
         string failo_pavadinimas = "studentai" + to_string(d) + ".txt";
-        ofstream fout(failo_pavadinimas);
 
+        auto start = high_resolution_clock::now();
+
+        ofstream fout(failo_pavadinimas);
         fout << "Vardas Pavarde ND1 ND2 ND3 ND4 ND5 Egz" << endl;
 
         for (int i = 1; i <= d; i++) {
@@ -452,11 +462,15 @@ void sugeneruotiFailus() {
             fout << (rand() % 10 + 1) << "\n";
         }
         fout.close();
-        cout << "Sugeneruotas failas: " << failo_pavadinimas << endl;
+
+        auto end = high_resolution_clock::now();
+        auto trukme = duration_cast<milliseconds>(end - start);
+        cout << "Sugeneruotas failas: " << failo_pavadinimas
+            << " (" << trukme.count() << " ms)" << endl;
     }
 }
 
-// Funkcija lentelių išvedimui ir failų generavimui
+// Studentų lentelių išvedimas ir failų generavimas
 void rodytiIrIsvestiFailus(const vector<Studentas>& studentai) {
     vector<Studentas> sorted_studentai = studentai;
     sort(sorted_studentai.begin(), sorted_studentai.end(), [](const Studentas& a, const Studentas& b) {
@@ -468,8 +482,52 @@ void rodytiIrIsvestiFailus(const vector<Studentas>& studentai) {
     cout << "1 - Vidurkis\n2 - Mediana\n3 - Abu\n";
     cin >> pasirinkimas;
 
-   
+    cout << left;
+    if (pasirinkimas == 1) {
+        cout << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << endl;
+        cout << string(55, '-') << endl;
+        for (auto& s : sorted_studentai)
+            cout << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << fixed << setprecision(2) << s.gal_vid << endl;
+    }
+    else if (pasirinkimas == 2) {
+        cout << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Med.)" << endl;
+        cout << string(55, '-') << endl;
+        for (auto& s : sorted_studentai)
+            cout << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << fixed << setprecision(2) << s.gal_med << endl;
+    }
+    else if (pasirinkimas == 3) {
+        cout << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << "|" << setw(18) << "Galutinis (Med.)" << endl;
+        cout << string(80, '-') << endl;
+        for (auto& s : sorted_studentai)
+            cout << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << fixed << setprecision(2) << s.gal_vid << "|" << setw(18) << fixed << setprecision(2) << s.gal_med << endl;
+    }
+
+    // Suskirstome į dvi grupes pagal galutinį balą (vidurkį)
+    vector<Studentas> vargsiukai, kietiakiai;
+    for (auto& s : sorted_studentai) {
+        if (s.gal_vid < 5.0) vargsiukai.push_back(s);
+        else kietiakiai.push_back(s);
+    }
+
+    // Įrašome vargsiukus
+    ofstream fout_v("vargsiukai.txt");
+    fout_v << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
+    fout_v << string(55, '-') << endl;
+    for (auto& s : vargsiukai)
+        fout_v << setw(15) << s.var << setw(20) << s.pav << fixed << setprecision(2) << s.gal_vid << endl;
+    fout_v.close();
+
+    // Įrašome kietiakius
+    ofstream fout_k("kietiakiai.txt");
+    fout_k << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
+    fout_k << string(55, '-') << endl;
+    for (auto& s : kietiakiai)
+        fout_k << setw(15) << s.var << setw(20) << s.pav << fixed << setprecision(2) << s.gal_vid << endl;
+    fout_k.close();
+
+    cout << "\nSugeneruoti failai: vargsiukai.txt ir kietiakiai.txt" << endl;
 }
+
 
 //funkcijos.h
 #pragma once
