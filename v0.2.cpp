@@ -271,3 +271,232 @@ int main() {
 
     return 0;
 }
+
+
+
+//pagrindine.cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include "studentas.h"
+#include "funkcijos.h"
+
+using namespace std;
+
+int main() {
+    vector<Studentas> studentai;
+
+    int veiksmas;
+    cout << "Pasirinkite veiksma:\n1 - Ivesti studentus ranka\n2 - Generuoti atsitiktinius duomenis\n3 - Nuskaityti duomenis is failo\n4 - Sugeneruoti studentu sarasu failus\n";
+    cin >> veiksmas;
+
+    if (veiksmas == 1)
+        ivestiStudentus(studentai);
+    else if (veiksmas == 2)
+        generuotiStudentus(studentai);
+    else if (veiksmas == 3)
+        skaitytiIsFailo(studentai, "kursiokai.txt");
+    else if (veiksmas == 4)
+        sugeneruotiFailus();
+
+    if (veiksmas >= 1 && veiksmas <= 3)
+        rodytiIrIsvestiFailus(studentai);
+
+    return 0;
+}
+
+//funkcijos.cpp
+#include "funkcijos.h"
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+double mediana(vector<int> paz) {
+    if (paz.empty()) return 0.0;
+    sort(paz.begin(), paz.end());
+    int n = paz.size();
+    if (n % 2 == 0)
+        return (paz[n / 2 - 1] + paz[n / 2]) / 2.0;
+    else
+        return paz[n / 2];
+}
+
+void ivestiStudentus(vector<Studentas>& studentai) {
+    int kiek;
+    cout << "Kiek studentu norite ivesti? ";
+    cin >> kiek;
+
+    for (int k = 0; k < kiek; k++) {
+        Studentas s;
+        int sum = 0;
+
+        cout << "Ivesk studento duomenis" << endl;
+        cout << "Vardas: ";
+        cin >> s.var;
+        cout << "Pavarde: ";
+        cin >> s.pav;
+
+        cout << "Iveskite namu darbu rezultatus (baigti su 0):" << endl;
+        int pazymys;
+        while (true) {
+            cin >> pazymys;
+            if (pazymys == 0) break;
+            s.paz.push_back(pazymys);
+            sum += pazymys;
+        }
+
+        cout << "Iveskite egzamino pazymi: ";
+        cin >> s.egz;
+
+        if (!s.paz.empty())
+            s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
+        else
+            s.gal_vid = s.egz;
+
+        s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
+
+        studentai.push_back(s);
+    }
+}
+
+void generuotiStudentus(vector<Studentas>& studentai) {
+    srand(time(0));
+    int kiek;
+    cout << "Kiek studentu sugeneruoti? ";
+    cin >> kiek;
+
+    for (int k = 0; k < kiek; k++) {
+        Studentas s;
+        int sum = 0;
+
+        cout << "Studento vardas: ";
+        cin >> s.var;
+        cout << "Studento pavarde: ";
+        cin >> s.pav;
+
+        int kiek_nd = rand() % 8 + 3;
+        for (int i = 0; i < kiek_nd; i++) {
+            int pazymys = rand() % 10 + 1;
+            s.paz.push_back(pazymys);
+            sum += pazymys;
+        }
+
+        s.egz = rand() % 10 + 1;
+
+        if (!s.paz.empty())
+            s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
+        else
+            s.gal_vid = s.egz;
+
+        s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
+
+        studentai.push_back(s);
+    }
+}
+
+void skaitytiIsFailo(vector<Studentas>& studentai, const string& failo_pavadinimas) {
+    ifstream fin(failo_pavadinimas);
+    if (!fin) {
+        cout << "Nepavyko atidaryti failo" << endl;
+        return;
+    }
+
+    string header;
+    getline(fin, header);
+
+    while (!fin.eof()) {
+        Studentas s;
+        int sum = 0;
+        fin >> s.var >> s.pav;
+        if (fin.eof()) break;
+
+        int pazymys;
+        for (int i = 0; i < 5; i++) {
+            fin >> pazymys;
+            s.paz.push_back(pazymys);
+            sum += pazymys;
+        }
+        fin >> s.egz;
+
+        if (!s.paz.empty())
+            s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
+        else
+            s.gal_vid = s.egz;
+
+        s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
+
+        studentai.push_back(s);
+    }
+
+    fin.close();
+}
+
+void sugeneruotiFailus() {
+    srand(time(0));
+    vector<int> dydziai = { 1000, 10000, 100000, 1000000, 10000000 };
+    for (int d : dydziai) {
+        string failo_pavadinimas = "studentai" + to_string(d) + ".txt";
+        ofstream fout(failo_pavadinimas);
+
+        fout << "Vardas Pavarde ND1 ND2 ND3 ND4 ND5 Egz" << endl;
+
+        for (int i = 1; i <= d; i++) {
+            fout << "Vardas" << i << " Pavarde" << i << " ";
+            for (int j = 0; j < 5; j++)
+                fout << (rand() % 10 + 1) << " ";
+            fout << (rand() % 10 + 1) << "\n";
+        }
+        fout.close();
+        cout << "Sugeneruotas failas: " << failo_pavadinimas << endl;
+    }
+}
+
+// Funkcija lentelių išvedimui ir failų generavimui
+void rodytiIrIsvestiFailus(const vector<Studentas>& studentai) {
+    vector<Studentas> sorted_studentai = studentai;
+    sort(sorted_studentai.begin(), sorted_studentai.end(), [](const Studentas& a, const Studentas& b) {
+        return a.pav < b.pav;
+        });
+
+    int pasirinkimas;
+    cout << "Pasirinkite galutinio balo skaiciavimo metoda: " << endl;
+    cout << "1 - Vidurkis\n2 - Mediana\n3 - Abu\n";
+    cin >> pasirinkimas;
+
+   
+}
+
+//funkcijos.h
+#pragma once
+#include "studentas.h"
+#include <vector>
+
+double mediana(std::vector<int> paz);
+
+// Funkcijos studentų įvedimui / generavimui
+void ivestiStudentus(std::vector<Studentas>& studentai);
+void generuotiStudentus(std::vector<Studentas>& studentai);
+void skaitytiIsFailo(std::vector<Studentas>& studentai, const std::string& failo_pavadinimas);
+void sugeneruotiFailus();
+void rodytiIrIsvestiFailus(const std::vector<Studentas>& studentai);
+#pragma once
+
+//studentas.h
+#pragma once
+#include <string>
+#include <vector>
+
+struct Studentas {
+    std::string var;
+    std::string pav;
+    std::vector<int> paz;
+    int egz{};
+    double gal_vid{};
+    double gal_med{};
+};
+
