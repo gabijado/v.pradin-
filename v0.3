@@ -1,273 +1,71 @@
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <list>
-#include <string>
-#include <algorithm>
-#include <limits>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <sstream>
-#include <chrono>
+else if (veiksmas == 5) {
+    cout << "Testuojamas konteineriu veikimo greitis (vector vs list)...\n";
 
-using namespace std;
-using namespace std::chrono;
+    // --- 1. Duomenu nuskaitymas ---
+    auto start_v = high_resolution_clock::now();
+    auto studentai_v = skaitytiIsFailo<vector<Studentas>>("kursiokai.txt");
+    auto end_v = high_resolution_clock::now();
+    double laikas_vector_nuskaitymas = duration_cast<duration<double>>(end_v - start_v).count();
 
-struct Studentas {
-    string var;
-    string pav;
-    vector<int> paz;
-    int egz{};
-    double gal_vid{};
-    double gal_med{};
-};
+    auto start_l = high_resolution_clock::now();
+    auto studentai_l = skaitytiIsFailo<list<Studentas>>("kursiokai.txt");
+    auto end_l = high_resolution_clock::now();
+    double laikas_list_nuskaitymas = duration_cast<duration<double>>(end_l - start_l).count();
 
-// funkcija medianai apskaičiuoti
-double mediana(vector<int> paz) {
-    if (paz.empty()) return 0.0;
-    sort(paz.begin(), paz.end());
-    int n = paz.size();
-    if (n % 2 == 0)
-        return (paz[n / 2 - 1] + paz[n / 2]) / 2.0;
-    else
-        return paz[n / 2];
+    // --- 2. Skirstymas i dvi grupes ---
+    auto start_v2 = high_resolution_clock::now();
+    vector<Studentas> vargsiukai_v, kietiakiai_v;
+    for (auto& s : studentai_v) {
+        if (s.gal_vid < 5.0) vargsiukai_v.push_back(s);
+        else kietiakiai_v.push_back(s);
+    }
+    auto end_v2 = high_resolution_clock::now();
+    double laikas_vector_skirstymas = duration_cast<duration<double>>(end_v2 - start_v2).count();
+
+    auto start_l2 = high_resolution_clock::now();
+    list<Studentas> vargsiukai_l, kietiakiai_l;
+    for (auto& s : studentai_l) {
+        if (s.gal_vid < 5.0) vargsiukai_l.push_back(s);
+        else kietiakiai_l.push_back(s);
+    }
+    auto end_l2 = high_resolution_clock::now();
+    double laikas_list_skirstymas = duration_cast<duration<double>>(end_l2 - start_l2).count();
+
+    // --- 3. Failu irasymas ---
+    auto start_v3 = high_resolution_clock::now();
+    ofstream fout1("vargsiukai_vector.txt"), fout2("kietiakiai_vector.txt");
+    fout1 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis(Vid.)" << endl;
+    fout2 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis(Vid.)" << endl;
+    for (auto& s : vargsiukai_v) fout1 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
+    for (auto& s : kietiakiai_v) fout2 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
+    fout1.close(); fout2.close();
+    auto end_v3 = high_resolution_clock::now();
+    double laikas_vector_irasymas = duration_cast<duration<double>>(end_v3 - start_v3).count();
+
+    auto start_l3 = high_resolution_clock::now();
+    ofstream fout3("vargsiukai_list.txt"), fout4("kietiakiai_list.txt");
+    fout3 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis(Vid.)" << endl;
+    fout4 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis(Vid.)" << endl;
+    for (auto& s : vargsiukai_l) fout3 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
+    for (auto& s : kietiakiai_l) fout4 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
+    fout3.close(); fout4.close();
+    auto end_l3 = high_resolution_clock::now();
+    double laikas_list_irasymas = duration_cast<duration<double>>(end_l3 - start_l3).count();
+
+    // --- 4. Rezultatu lentele ---
+    cout << fixed << setprecision(4);
+    cout << "\n-----------------------------------------------\n";
+    cout << "| Konteineris | Nuskaitymas | Skirstymas | Įrašymas |\n";
+    cout << "-----------------------------------------------\n";
+    cout << "| vector      | " << setw(11) << laikas_vector_nuskaitymas 
+         << " | " << setw(10) << laikas_vector_skirstymas
+         << " | " << setw(9) << laikas_vector_irasymas << " |\n";
+    cout << "| list        | " << setw(11) << laikas_list_nuskaitymas 
+         << " | " << setw(10) << laikas_list_skirstymas
+         << " | " << setw(9) << laikas_list_irasymas << " |\n";
+    cout << "-----------------------------------------------\n";
+
+    cout << "\nSugeneruoti failai: vargsiukai_vector.txt, kietiakiai_vector.txt, vargsiukai_list.txt, kietiakiai_list.txt\n";
 }
 
-// duomenų skaitymas iš failo (template)
-template <typename Container>
-Container skaitytiIsFailo(const string& failo_pav) {
-    Container studentai;
-    ifstream fin(failo_pav);
-    if (!fin) {
-        cout << "Nepavyko atidaryti failo: " << failo_pav << endl;
-        return studentai;
-    }
 
-    string header;
-    getline(fin, header);
-
-    int nd_kiekis = 0;
-    {
-        stringstream ss(header);
-        string zodis;
-        vector<string> stulpeliai;
-        while (ss >> zodis) stulpeliai.push_back(zodis);
-        nd_kiekis = stulpeliai.size() - 3;
-    }
-
-    while (true) {
-        Studentas s;
-        int sum = 0;
-        fin >> s.var >> s.pav;
-        if (fin.fail()) break;
-
-        int pazymys;
-        for (int i = 0; i < nd_kiekis; i++) {
-            fin >> pazymys;
-            if (fin.fail()) break;
-            s.paz.push_back(pazymys);
-            sum += pazymys;
-        }
-
-        fin >> s.egz;
-        if (fin.fail()) break;
-
-        if (!s.paz.empty())
-            s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
-        else
-            s.gal_vid = s.egz;
-
-        s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
-        studentai.push_back(s);
-    }
-    fin.close();
-    return studentai;
-}
-
-// rezultatų rodymas ir failų generavimas
-template <typename Container>
-void rodytiRezultatus(Container& studentai) {
-    // rūšiavimas
-    if constexpr (is_same<Container, vector<Studentas>>::value)
-        sort(studentai.begin(), studentai.end(), [](Studentas& a, Studentas& b) { return a.pav < b.pav; });
-    else // list
-        studentai.sort([](Studentas& a, Studentas& b) { return a.pav < b.pav; });
-
-    int pasirinkimas;
-    cout << "Pasirinkite galutinio balo skaiciavimo metoda:\n1 - Vidurkis\n2 - Mediana\n3 - Abu\n";
-    cin >> pasirinkimas;
-
-    cout << fixed << setprecision(2);
-
-    if (pasirinkimas == 1) {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << endl;
-        cout << string(55, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << s.gal_vid << endl;
-    } else if (pasirinkimas == 2) {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Med.)" << endl;
-        cout << string(55, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << s.gal_med << endl;
-    } else {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20) << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << "|" << setw(18) << "Galutinis (Med.)" << endl;
-        cout << string(80, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20) << s.pav << "|" << setw(18) << s.gal_vid << "|" << setw(18) << s.gal_med << endl;
-    }
-
-    // skirstymas į grupes
-    Container vargsiukai, kietiakiai;
-    for (auto& s : studentai) {
-        if (s.gal_vid < 5.0)
-            vargsiukai.push_back(s);
-        else
-            kietiakiai.push_back(s);
-    }
-
-    ofstream fout1("vargsiukai.txt"), fout2("kietiakiai.txt");
-    fout1 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
-    fout2 << left << setw(15) << "Vardas" << setw(20) << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
-
-    for (auto& s : vargsiukai)
-        fout1 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
-    for (auto& s : kietiakiai)
-        fout2 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
-
-    cout << "\nSugeneruoti failai: vargsiukai.txt ir kietiakiai.txt\n";
-}
-
-int main() {
-    srand(time(0));
-    vector<Studentas> studentai;
-
-    int veiksmas;
-    cout << "Pasirinkite veiksma:\n1 - Ivesti studentus ranka\n2 - Generuoti atsitiktinius duomenis\n3 - Nuskaityti duomenis is failo\n4 - Sugeneruoti studentu sarasu failus\n5 - Palyginti vector ir list veikimo greiti\n";
-    cin >> veiksmas;
-
-    if (veiksmas == 1) {
-        int kiek;
-        cout << "Kiek studentu norite ivesti? ";
-        cin >> kiek;
-
-        for (int k = 0; k < kiek; k++) {
-            Studentas s;
-            int sum = 0;
-            cout << "Vardas: "; cin >> s.var;
-            cout << "Pavarde: "; cin >> s.pav;
-
-            cout << "Iveskite namu darbu rezultatus (baigti su 0):\n";
-            int paz;
-            while (true) {
-                cin >> paz;
-                if (paz == 0) break;
-                s.paz.push_back(paz);
-                sum += paz;
-            }
-
-            cout << "Egzamino pazymys: ";
-            cin >> s.egz;
-
-            if (!s.paz.empty())
-                s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
-            else
-                s.gal_vid = s.egz;
-
-            s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
-            studentai.push_back(s);
-        }
-
-        rodytiRezultatus(studentai);
-
-    } else if (veiksmas == 2) {
-        int kiek;
-        cout << "Kiek studentu sugeneruoti? ";
-        cin >> kiek;
-
-        for (int i = 0; i < kiek; i++) {
-            Studentas s;
-            int sum = 0;
-            cout << "Studento vardas: "; cin >> s.var;
-            cout << "Studento pavarde: "; cin >> s.pav;
-
-            int kiek_nd = rand() % 8 + 3;
-            for (int j = 0; j < kiek_nd; j++) {
-                int paz = rand() % 10 + 1;
-                s.paz.push_back(paz);
-                sum += paz;
-            }
-
-            s.egz = rand() % 10 + 1;
-            s.gal_vid = double(sum) / s.paz.size() * 0.4 + s.egz * 0.6;
-            s.gal_med = mediana(s.paz) * 0.4 + s.egz * 0.6;
-
-            studentai.push_back(s);
-        }
-
-        rodytiRezultatus(studentai);
-
-    } else if (veiksmas == 3) {
-        auto start_v = high_resolution_clock::now();
-        auto studentai_v = skaitytiIsFailo<vector<Studentas>>("kursiokai.txt");
-        auto end_v = high_resolution_clock::now();
-
-        auto start_l = high_resolution_clock::now();
-        auto studentai_l = skaitytiIsFailo<list<Studentas>>("kursiokai.txt");
-        auto end_l = high_resolution_clock::now();
-
-        cout << fixed << setprecision(4);
-        cout << "\n-------------------------------------------\n";
-        cout << "| Konteineris | Nuskaitymo laikas (s)    |\n";
-        cout << "-------------------------------------------\n";
-        cout << "| vector      | " << setw(24) << duration_cast<duration<double>>(end_v - start_v).count() << " |\n";
-        cout << "| list        | " << setw(24) << duration_cast<duration<double>>(end_l - start_l).count() << " |\n";
-        cout << "-------------------------------------------\n";
-
-        rodytiRezultatus(studentai_v);
-        rodytiRezultatus(studentai_l);
-
-    } else if (veiksmas == 4) {
-        vector<int> dydziai = {1000, 10000, 100000, 1000000, 10000000};
-
-        for (int d : dydziai) {
-            auto start = high_resolution_clock::now();
-            string failo_pav = "studentai" + to_string(d) + ".txt";
-            ofstream fout(failo_pav);
-            fout << "Vardas Pavarde ND1 ND2 ND3 ND4 ND5 Egz\n";
-            for (int i = 1; i <= d; i++) {
-                fout << "Vardas" << i << " Pavarde" << i << " ";
-                for (int j = 0; j < 5; j++)
-                    fout << rand() % 10 + 1 << " ";
-                fout << rand() % 10 + 1 << "\n";
-            }
-            fout.close();
-
-            auto end = high_resolution_clock::now();
-            cout << "Failo " << failo_pav << " kurimas uztruko: " << duration_cast<duration<double>>(end - start).count() << " s\n";
-        }
-
-    } else if (veiksmas == 5) {
-        cout << "Testuojamas konteineriu veikimo greitis (vector vs list)...\n";
-
-        auto start_v = high_resolution_clock::now();
-        auto studentai_v = skaitytiIsFailo<vector<Studentas>>("kursiokai.txt");
-        auto end_v = high_resolution_clock::now();
-        double laikas_vector = duration_cast<duration<double>>(end_v - start_v).count();
-
-        auto start_l = high_resolution_clock::now();
-        auto studentai_l = skaitytiIsFailo<list<Studentas>>("kursiokai.txt");
-        auto end_l = high_resolution_clock::now();
-        double laikas_list = duration_cast<duration<double>>(end_l - start_l).count();
-
-        cout << fixed << setprecision(4);
-        cout << "\n-------------------------------------------\n";
-        cout << "| Konteineris | Nuskaitymo laikas (s)    |\n";
-        cout << "-------------------------------------------\n";
-        cout << "| vector      | " << setw(24) << laikas_vector << " |\n";
-        cout << "| list        | " << setw(24) << laikas_list << " |\n";
-        cout << "-------------------------------------------\n";
-    }
-
-    return 0;
-}
