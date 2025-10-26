@@ -26,7 +26,6 @@ struct Studentas {
     double gal_med{};
 };
 
-// Funkcijų deklaracijos
 double mediana(vector<int> paz);
 
 template <typename Container>
