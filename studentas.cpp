@@ -1,4 +1,14 @@
 #include "studentas.h"
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <iomanip>
+#include <list>
+
+using namespace std;
 
 // Funkcija medianai apskaičiuoti
 double mediana(vector<int> paz) {
@@ -11,7 +21,7 @@ double mediana(vector<int> paz) {
         return paz[n / 2];
 }
 
-// Funkcija duomenims skaityti iš failo (stabili versija)
+// Template funkcija duomenims skaityti iš failo
 template <typename Container>
 Container skaitytiIsFailo(const string& failo_pav) {
     Container studentai;
@@ -22,18 +32,17 @@ Container skaitytiIsFailo(const string& failo_pav) {
     }
 
     string header;
-    getline(fin, header); // perskaitome header eilutę
+    getline(fin, header);
 
     string line;
     while (getline(fin, line)) {
-        if (line.empty()) continue; // praleidžiame tuščias eilutes
+        if (line.empty()) continue;
         stringstream ss(line);
         Studentas s;
         ss >> s.var >> s.pav;
 
         int sum = 0;
         int pazymys;
-        // 5 namų darbai
         for (int i = 0; i < 5; i++) {
             ss >> pazymys;
             s.paz.push_back(pazymys);
@@ -52,67 +61,6 @@ Container skaitytiIsFailo(const string& failo_pav) {
     return studentai;
 }
 
-// Funkcija rezultatų rodymui ir failų generavimui
-void rodytiRezultatus(vector<Studentas>& studentai) {
-    sort(studentai.begin(), studentai.end(),
-        [](const Studentas& a, const Studentas& b) { return a.pav < b.pav; });
-
-    int pasirinkimas;
-    cout << "Pasirinkite galutinio balo skaiciavimo metoda: \n";
-    cout << "1 - Vidurkis\n2 - Mediana\n3 - Abu\n";
-    cin >> pasirinkimas;
-
-    cout << fixed << setprecision(2);
-    if (pasirinkimas == 1) {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20)
-            << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)" << endl;
-        cout << string(55, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20)
-            << s.pav << "|" << setw(18) << s.gal_vid << endl;
-    }
-    else if (pasirinkimas == 2) {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20)
-            << "Pavarde" << "|" << setw(18) << "Galutinis (Med.)" << endl;
-        cout << string(55, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20)
-            << s.pav << "|" << setw(18) << s.gal_med << endl;
-    }
-    else {
-        cout << left << setw(15) << "Vardas" << "|" << setw(20)
-            << "Pavarde" << "|" << setw(18) << "Galutinis (Vid.)"
-            << "|" << setw(18) << "Galutinis (Med.)" << endl;
-        cout << string(80, '-') << endl;
-        for (auto& s : studentai)
-            cout << left << setw(15) << s.var << "|" << setw(20)
-            << s.pav << "|" << setw(18) << s.gal_vid
-            << "|" << setw(18) << s.gal_med << endl;
-    }
-
-    // Skirstymas į grupes
-    vector<Studentas> vargsiukai, kietiakiai;
-    for (auto& s : studentai) {
-        if (s.gal_vid < 5.0)
-            vargsiukai.push_back(s);
-        else
-            kietiakiai.push_back(s);
-    }
-
-    ofstream fout1("vargsiukai.txt"), fout2("kietiakiai.txt");
-    fout1 << left << setw(15) << "Vardas" << setw(20)
-        << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
-    fout2 << left << setw(15) << "Vardas" << setw(20)
-        << "Pavarde" << setw(18) << "Galutinis (Vid.)" << endl;
-
-    for (auto& s : vargsiukai)
-        fout1 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
-    for (auto& s : kietiakiai)
-        fout2 << left << setw(15) << s.var << setw(20) << s.pav << s.gal_vid << endl;
-
-    cout << "\nSugeneruoti failai: vargsiukai.txt ir kietiakiai.txt\n";
-}
-
-// Kadangi template funkcijos turi būti matomos kompiliacijos metu:
+// Explicit instanciacijos
 template vector<Studentas> skaitytiIsFailo<vector<Studentas>>(const string&);
 template list<Studentas> skaitytiIsFailo<list<Studentas>>(const string&);
