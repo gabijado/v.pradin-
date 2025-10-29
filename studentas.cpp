@@ -61,6 +61,5 @@ Container skaitytiIsFailo(const string& failo_pav) {
     return studentai;
 }
 
-// Explicit instanciacijos
 template vector<Studentas> skaitytiIsFailo<vector<Studentas>>(const string&);
 template list<Studentas> skaitytiIsFailo<list<Studentas>>(const string&);
