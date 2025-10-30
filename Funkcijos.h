@@ -1,14 +1,12 @@
 #ifndef FUNKCIJOS_H
 #define FUNKCIJOS_H
 
-#include "Studentas.h"
+#include "studentas.h"
 #include <vector>
+#include <string>
 
-void ivestiStudentus(std::vector<Studentas>& studentai);
-void generuotiStudentus(std::vector<Studentas>& studentai);
-void nuskaitytiIsFailo(std::vector<Studentas>& studentai);
-void generuotiFailus();
-void rodytiRezultatus(std::vector<Studentas>& studentai);
-void issaugotiIRusiuoti(std::vector<Studentas>& studentai);
+void generuotiFaila(int kiekis);
+std::vector<Studentas> skaitytiIsFailo(const std::string& failo_pav);
+void skirstytiIrRasyti(const std::vector<Studentas>& studentai, const std::string& failo_pavadinimas);
 
 #endif
