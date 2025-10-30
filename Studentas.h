@@ -1,9 +1,8 @@
 #ifndef STUDENTAS_H
 #define STUDENTAS_H
 
-#include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 struct Studentas {
     std::string var;
@@ -11,7 +10,6 @@ struct Studentas {
     std::vector<int> paz;
     int egz{};
     double gal_vid{};
-    double gal_med{};
 };
 
 double mediana(std::vector<int> paz);
