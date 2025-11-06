@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <numeric> // pridėta dėl vidurkių skaičiavimo
 using namespace std;
 using namespace std::chrono;
 
@@ -86,44 +87,72 @@ int main() {
             cin >> strategija;
             cin.ignore();
 
-            // Vector skaitymas ir skirstymas
-            auto start_v = high_resolution_clock::now();
-            auto studentai_v = skaitytiIsFailo<vector<Studentas>>(failo_pav);
-            auto end_v = high_resolution_clock::now();
-            double v_read = duration_cast<duration<double>>(end_v - start_v).count();
+            // Saugo 3 kartų laikus
+            vector<double> v_read_times, v_split_times, v_write_times;
+            vector<double> l_read_times, l_split_times, l_write_times;
 
-            double v_split = 0.0, v_write = 0.0;
-            if (strategija == 1)
-                skirstytiStrategija1<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
-            else if (strategija == 2)
-                skirstytiStrategija2<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
-            else
-                skirstytiStrategija3<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
+            for (int kartas = 1; kartas <= 3; kartas++) {
+                cout << "\nTesto kartas: " << kartas << endl;
 
-            // List skaitymas ir skirstymas
-            auto start_l = high_resolution_clock::now();
-            auto studentai_l = skaitytiIsFailo<list<Studentas>>(failo_pav);
-            auto end_l = high_resolution_clock::now();
-            double l_read = duration_cast<duration<double>>(end_l - start_l).count();
+                // Vector skaitymas ir skirstymas
+                auto start_v = high_resolution_clock::now();
+                auto studentai_v = skaitytiIsFailo<vector<Studentas>>(failo_pav);
+                auto end_v = high_resolution_clock::now();
+                double v_read = duration_cast<duration<double>>(end_v - start_v).count();
 
-            double l_split = 0.0, l_write = 0.0;
-            if (strategija == 1)
-                skirstytiStrategija1<list<Studentas>>(studentai_l, "list", l_split, l_write);
-            else if (strategija == 2)
-                skirstytiStrategija2<list<Studentas>>(studentai_l, "list", l_split, l_write);
-            else
-                skirstytiStrategija3<list<Studentas>>(studentai_l, "list", l_split, l_write);
+                double v_split = 0.0, v_write = 0.0;
+                if (strategija == 1)
+                    skirstytiStrategija1<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
+                else if (strategija == 2)
+                    skirstytiStrategija2<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
+                else
+                    skirstytiStrategija3<vector<Studentas>>(studentai_v, "vector", v_split, v_write);
 
-            // Ekrano išvedimas
+                // List skaitymas ir skirstymas
+                auto start_l = high_resolution_clock::now();
+                auto studentai_l = skaitytiIsFailo<list<Studentas>>(failo_pav);
+                auto end_l = high_resolution_clock::now();
+                double l_read = duration_cast<duration<double>>(end_l - start_l).count();
+
+                double l_split = 0.0, l_write = 0.0;
+                if (strategija == 1)
+                    skirstytiStrategija1<list<Studentas>>(studentai_l, "list", l_split, l_write);
+                else if (strategija == 2)
+                    skirstytiStrategija2<list<Studentas>>(studentai_l, "list", l_split, l_write);
+                else
+                    skirstytiStrategija3<list<Studentas>>(studentai_l, "list", l_split, l_write);
+
+                // Saugo laikus
+                v_read_times.push_back(v_read);
+                v_split_times.push_back(v_split);
+                v_write_times.push_back(v_write);
+                l_read_times.push_back(l_read);
+                l_split_times.push_back(l_split);
+                l_write_times.push_back(l_write);
+            }
+
+            // Vidurkių skaičiavimas
+            auto avg = [](const vector<double>& v) {
+                return accumulate(v.begin(), v.end(), 0.0) / v.size();
+                };
+
+            double v_read_avg = avg(v_read_times);
+            double v_split_avg = avg(v_split_times);
+            double v_write_avg = avg(v_write_times);
+            double l_read_avg = avg(l_read_times);
+            double l_split_avg = avg(l_split_times);
+            double l_write_avg = avg(l_write_times);
+
+            // Išvedimas į ekraną
             cout << "\n---------------------------------------------------------------\n";
             cout << "| Konteineris | Nuskaitymas (s) | Skirstymas (s) | Rasymas (s) |\n";
             cout << "---------------------------------------------------------------\n";
-            cout << "| vector      | " << setw(15) << v_read << " | " << setw(14) << v_split << " | " << setw(11) << v_write << " |\n";
-            cout << "| list        | " << setw(15) << l_read << " | " << setw(14) << l_split << " | " << setw(11) << l_write << " |\n";
+            cout << "| vector (vid.) | " << setw(13) << v_read_avg << " | " << setw(14) << v_split_avg << " | " << setw(11) << v_write_avg << " |\n";
+            cout << "| list (vid.)   | " << setw(13) << l_read_avg << " | " << setw(14) << l_split_avg << " | " << setw(11) << l_write_avg << " |\n";
             cout << "---------------------------------------------------------------\n";
 
-            // Automatinis įrašymas į README.md
-            irasytiRezultatusReadme(v_read, v_split, v_write, l_read, l_split, l_write, failo_pav);
+            // Įrašymas į README.md
+            irasytiRezultatusReadme(v_read_avg, v_split_avg, v_write_avg, l_read_avg, l_split_avg, l_write_avg, failo_pav);
         }
     }
     else if (veiksmas == 6) {
