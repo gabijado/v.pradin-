@@ -1,5 +1,3 @@
-# v.pradin-
-
 # Studentų rezultatų analizė
 
 Ši C++ programa analizuoja studentų rezultatus, apskaičiuoja jų galutinius įvertinimus ir efektyviai paskirsto studentus į grupes pagal pažymius.
@@ -179,3 +177,38 @@ Programa skaito studentų duomenis, apskaičiuoja galutinius įvertinimus ir ski
 1. list konteineris veikia greičiau skirstant duomenis, bet lėčiau rašant į failą.
 2. vector pasižymi geresniu bendru laiko–atminties balansu.
 3. 3 strategija (su partition) yra efektyviausia tiek laiko, tiek atminties požiūriu.
+
+## CMake įdiegimas Windows naudojant .msi paketą
+1. Atsisiuntimas
+   1. Reikia įeiti į oficialų CMake puslapį: https://cmake.org/download/
+   2. Pasirinkti Windows x64 Installer (.msi) versiją.
+2. Diegimas
+   1. Paleisti atsisiųstą .msi failą.
+   2. Spausti Next visuose languose.
+   3. Svarbu: pasirinkti "Add CMake to the system PATH for all users" arba "for current user".
+3. Baigimas
+   1. Spauskite Finish, kai diegimas baigtas.
+   2. Atidarykite naują PowerShell langą.
+   3. Patikrinkite diegimą įvedę: cmake --version
+
+## CMakeLists.txt failas
+CMakeLists.txt failas turėtų atrodyti taip:
+
+cmake_minimum_required(VERSION 3.25)
+
+project(Studentu_programa)
+
+include_directories(include)
+
+file(GLOB SOURCES "src/*.cpp")
+
+add_executable(Studentu_programa ${SOURCES})
+
+## Į PowerShell reikia rašyti taip:
+cmake CMakeLists.txt
+cmake --install .
+cmake -- build .
+copy src\studentai_*.txt Debug\Studentu_programa
+cd Debug\
+Studentu_programa.exe
+pause
